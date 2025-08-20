@@ -1,0 +1,15 @@
+# Log files
+server/logs/
+receiver/logs/
+*.log
+
+# Podman volumes
+volumes/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/

@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  syslog-receiver:
+    build: ./receiver
+    container_name: syslog-receiver
+    hostname: syslog-receiver
+    networks:
+      - syslog-net
+    ports:
+      - "5515:514/udp"
+      - "5515:514/tcp"
+    volumes:
+      - ./receiver/logs:/var/log
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pidof", "rsyslogd"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  syslog-server:
+    build: ./server
+    container_name: syslog-server
+    hostname: syslog-server
+    networks:
+      - syslog-net
+    volumes:
+      - ./server/logs:/var/log
+    depends_on:
+      syslog-receiver:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      - SYSLOG_RECEIVER=syslog-receiver
+
+networks:
+  syslog-net:
+    driver: bridge
